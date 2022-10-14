@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+
+	"github.com/joho/godotenv"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -59,7 +62,14 @@ func usersPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	err := godotenv.Load()
+
+	if err != nil {
+		fmt.Println("failed to load env files")
+	}
+
 	http.HandleFunc("/", homePage)
 	http.HandleFunc("/users", usersPage)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	PORT := fmt.Sprintf(":%s", os.Getenv("PORT"))
+	log.Fatal(http.ListenAndServe(PORT, nil))
 }
