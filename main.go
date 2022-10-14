@@ -11,8 +11,10 @@ import (
 )
 
 type User struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID      int    `json:"id"`
+	Name    string `json:"name"`
+	Email   string `json:"email"`
+	Summary string `json:"summary"`
 }
 
 func homePage(w http.ResponseWriter, r *http.Request) {
@@ -21,7 +23,6 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 }
 
 func getUsers() []*User {
-
 	//open db connection
 	db, err := sql.Open("mysql", "test_user:secret@tcp(db:3306)/test_database")
 	if err != nil {
@@ -37,18 +38,23 @@ func getUsers() []*User {
 
 	for result.Next() {
 		var u User
-		err = result.Scan(&u.ID, &u.Name)
+		err = result.Scan(&u.ID, &u.Name, &u.Email, &u.Summary)
+
 		if err != nil {
 			panic(err)
 		}
+		fmt.Println("Users------------------", &u)
+
 		users = append(users, &u)
 	}
 	return users
 
 }
+
 func usersPage(w http.ResponseWriter, r *http.Request) {
 	users := getUsers()
-	fmt.Println(w, "Welcome to the users page")
+	fmt.Println(w, users)
+
 	json.NewEncoder(w).Encode(users)
 }
 
