@@ -9,12 +9,12 @@ import (
 	"github.com/titusdishon/go-docker-mysql/utils"
 )
 
-func HomePage(w http.ResponseWriter, r *http.Request) {
+func PingMe(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Welcome to the home page")
 	fmt.Printf("Hit the home endpoint")
 }
 
-func UsersPage(w http.ResponseWriter, r *http.Request) {
+func GetUsers(w http.ResponseWriter, r *http.Request) {
 	users := models.GetAllUsers()
 	json.NewEncoder(w).Encode(users)
 }
