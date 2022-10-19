@@ -72,6 +72,19 @@ func GetUserById(id int64) *User {
 	return &user
 }
 
+func (u *User) UpdateUser(id int64) *User {
+	stmt, err := db.Prepare(`UPDATE users SET name = ?, email = ?, summary = ? WHERE id = ?;`)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(u.Name, u.Email, u.Summary, id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return u
+}
+
 func DeleteUser(id int64) int {
 	result, err := db.Exec("DELETE FROM users WHERE id=?", id)
 	if err != nil {

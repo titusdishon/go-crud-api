@@ -43,6 +43,35 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func UpdateUser(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userId := vars["userId"]
+	ID, err := strconv.ParseInt(userId, 0, 0)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Invalid user id"))
+		return
+	}
+	updateUser := &models.User{}
+	utils.ParseBody(r, updateUser)
+	userDetails := models.GetUserById(ID)
+	if updateUser.Name != "" {
+		userDetails.Name = updateUser.Name
+	}
+	if updateUser.Email != "" {
+		userDetails.Email = updateUser.Email
+	}
+
+	if updateUser.Summary != "" {
+		userDetails.Summary = updateUser.Summary
+	}
+
+	b := updateUser.UpdateUser(ID)
+	res, _ := json.Marshal(b)
+	w.WriteHeader(http.StatusCreated)
+	w.Write(res)
+
+}
 func DeleteAUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userId := vars["userId"]
