@@ -4,14 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
+	"github.com/gorilla/mux"
 	"github.com/titusdishon/go-docker-mysql/models"
 	"github.com/titusdishon/go-docker-mysql/utils"
 )
 
 func PingMe(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Welcome to the home page")
-	fmt.Printf("Hit the home endpoint")
+	fmt.Printf("Hit the home endpoint %s", r.URL.Path)
+	fmt.Fprintf(w, "Welcome to the home  %s", r.URL.Query().Get("userId"))
 }
 
 func GetUsers(w http.ResponseWriter, r *http.Request) {
@@ -27,4 +29,23 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	w.Write(res)
 
+}
+
+func DeleteAUser(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userId := vars["userId"]
+	ID, err := strconv.ParseInt(userId, 0, 0)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Invalid user id"))
+		return
+	}
+	rows := models.DeleteUser(ID)
+	if rows != 1 {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("User does not exist"))
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Deleted successfully"))
 }
