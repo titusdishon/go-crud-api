@@ -59,6 +59,19 @@ func GetAllUsers() []*User {
 	return users
 }
 
+func GetUserById(id int64) *User {
+	var user User
+	err := db.QueryRow(`SELECT id, email, name, summary FROM users WHERE id=?;`, id).Scan(&user.ID,
+		&user.Email,
+		&user.Name,
+		&user.Summary)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+	return &user
+}
+
 func DeleteUser(id int64) int {
 	result, err := db.Exec("DELETE FROM users WHERE id=?", id)
 	if err != nil {

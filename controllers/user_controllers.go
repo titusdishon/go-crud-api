@@ -20,6 +20,18 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	users := models.GetAllUsers()
 	json.NewEncoder(w).Encode(users)
 }
+func GetUserById(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userId := vars["userId"]
+	ID, err := strconv.ParseInt(userId, 0, 0)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Invalid user id"))
+		return
+	}
+	user := models.GetUserById(ID)
+	json.NewEncoder(w).Encode(user)
+}
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	CreateUser := &models.User{}
