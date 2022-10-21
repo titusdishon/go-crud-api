@@ -7,4 +7,7 @@ require (
 	github.com/joho/godotenv v1.4.0
 )
 
-require github.com/gorilla/mux v1.8.0 // indirect
+require (
+	github.com/gorilla/mux v1.8.0 // indirect
+	github.com/rs/cors v1.8.2
+)
