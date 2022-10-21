@@ -1,7 +1,11 @@
-# Containerizing Golang applications with docker using docker compose
+# Implementing Clean Architecture Using golang, Mysql and  Docker
 
-In this repo I have added the necessary configurations for containerizing a golang application for m1 users
-
+In this repo I have added the necessary configurations for containerizing a golang application.
+I have also followed the clean architecture pattern where there is no dependency on:
+- No database dependency
+- Http library
+Thus separating the business logic from data storage logic.
+This way you can easily switch from one database to the other without needing much configuration
 ## Tech stack
 
 - Mysql
