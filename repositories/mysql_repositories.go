@@ -19,7 +19,7 @@ func init() {
 type UserRepository interface {
 	Save(user *entity.User) (*entity.User, error)
 	Update(user *entity.User, id int64) (*entity.User, error)
-	FindAll() ([]*entity.User, error)
+	FindAll() ([]entity.User, error)
 	FindById(id int64) (*entity.User, error)
 	Delete(id int64) (int64, error)
 }
@@ -60,12 +60,12 @@ func (*repo) Update(user *entity.User, id int64) (*entity.User, error) {
 	return user, nil
 }
 
-func (*repo) FindAll() ([]*entity.User, error) {
+func (*repo) FindAll() ([]entity.User, error) {
 	result, err := db.Query("SELECT * FROM users")
 	if err != nil {
 		return nil, err
 	}
-	var users []*entity.User
+	var users []entity.User
 
 	for result.Next() {
 		var u entity.User
@@ -74,7 +74,7 @@ func (*repo) FindAll() ([]*entity.User, error) {
 			return nil, err
 		}
 
-		users = append(users, &u)
+		users = append(users, u)
 	}
 	return users, nil
 }

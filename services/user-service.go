@@ -15,7 +15,7 @@ type UserService interface {
 	Validate(user *entity.User) error
 	Save(user *entity.User) (*entity.User, error)
 	Update(user *entity.User, id int64) (*entity.User, error)
-	FindAll() ([]*entity.User, error)
+	FindAll() ([]entity.User, error)
 	FindById(id int64) (*entity.User, error)
 	Delete(id int64) (int64, error)
 }
@@ -28,7 +28,7 @@ func NewUserService(repository repositories.UserRepository) UserService {
 
 func (*service) Validate(user *entity.User) error {
 	if user == nil {
-		err := errors.New("user is empty")
+		err := errors.New("user object is empty")
 		return err
 	}
 	if user.Name == "" {
@@ -51,7 +51,7 @@ func (*service) Save(user *entity.User) (*entity.User, error) {
 func (*service) Update(user *entity.User, id int64) (*entity.User, error) {
 	return repo.Update(user, id)
 }
-func (*service) FindAll() ([]*entity.User, error) {
+func (*service) FindAll() ([]entity.User, error) {
 	return repo.FindAll()
 }
 func (*service) FindById(id int64) (*entity.User, error) {
