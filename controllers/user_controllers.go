@@ -8,20 +8,38 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/titusdishon/go-docker-mysql/entity"
-	"github.com/titusdishon/go-docker-mysql/repositories"
+	errorHandler "github.com/titusdishon/go-docker-mysql/errors"
+	"github.com/titusdishon/go-docker-mysql/services"
 )
 
 var (
-	repo repositories.UserRepository = repositories.NewUserRepository()
+	userService services.UserService = services.NewUserService()
 )
 
-func PingMe(w http.ResponseWriter, r *http.Request) {
+type IUserController interface {
+	PingMe(w http.ResponseWriter, r *http.Request)
+	GetUsers(w http.ResponseWriter, r *http.Request)
+	GetUserById(w http.ResponseWriter, r *http.Request)
+	CreateUser(w http.ResponseWriter, r *http.Request)
+	DeleteAUser(w http.ResponseWriter, r *http.Request)
+	UpdateUser(w http.ResponseWriter, r *http.Request)
+}
+
+type controller struct{}
+
+func NewUserController() IUserController {
+	return &controller{}
+}
+
+func (*controller) PingMe(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	fmt.Printf("Hit the home endpoint %s", r.URL.Path)
 	_, _ = fmt.Fprintf(w, "Welcome to the home  %s", r.URL.Query().Get("userId"))
 }
 
-func GetUsers(w http.ResponseWriter, r *http.Request) {
-	users, err := repo.FindAll()
+func (*controller) GetUsers(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	users, err := userService.FindAll()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"Error":"Error processing your request"}`))
@@ -29,7 +47,8 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(users)
 }
 
-func GetUserById(w http.ResponseWriter, r *http.Request) {
+func (*controller) GetUserById(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	vars := mux.Vars(r)
 	userId := vars["userId"]
 	ID, err := strconv.ParseInt(userId, 0, 0)
@@ -38,7 +57,7 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte("Invalid user id"))
 		return
 	}
-	user, err := repo.FindById(ID)
+	user, err := userService.FindById(ID)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		_, _ = w.Write([]byte("User not found"))
@@ -47,38 +66,49 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(user)
 }
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+func (*controller) CreateUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	var user entity.User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"Error":"Wrong data format"}`))
+		json.NewEncoder(w).Encode(errorHandler.ServiceError{Message: "Wrong data format"})
 	}
-	repo.Save(&user)
+	validateErr := userService.Validate(&user)
+	if validateErr != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(errorHandler.ServiceError{Message: validateErr.Error()})
+	}
+	result, saveErr := userService.Save(&user)
+	if saveErr != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(errorHandler.ServiceError{Message: "Error saving the user"})
+	}
 	w.WriteHeader(http.StatusCreated)
-	_ = json.NewEncoder(w).Encode(user)
+	_ = json.NewEncoder(w).Encode(result)
 }
 
-func UpdateUser(w http.ResponseWriter, r *http.Request) {
+func (*controller) UpdateUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	vars := mux.Vars(r)
 	userId := vars["userId"]
 	ID, err := strconv.ParseInt(userId, 0, 0)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		_, _ = w.Write([]byte("Invalid user id"))
+		json.NewEncoder(w).Encode(errorHandler.ServiceError{Message: "Invalid user id"})
 		return
 	}
 	var user entity.User
 	json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"Error":"Wrong data format"}`))
+		json.NewEncoder(w).Encode(errorHandler.ServiceError{Message: "Wrong data format"})
 	}
 
-	userDetails, err := repo.FindById(ID)
+	userDetails, err := userService.FindById(ID)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
-		_, _ = w.Write([]byte("User not found"))
+		json.NewEncoder(w).Encode(errorHandler.ServiceError{Message: "User not found"})
 		return
 	}
 	if user.Name != "" {
@@ -91,31 +121,32 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	if user.Summary != "" {
 		userDetails.Summary = user.Summary
 	}
-	repo.Update(&user, ID)
+	userService.Update(&user, ID)
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(user)
 }
 
-func DeleteAUser(w http.ResponseWriter, r *http.Request) {
+func (*controller) DeleteAUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	vars := mux.Vars(r)
 	userId := vars["userId"]
 	ID, err := strconv.ParseInt(userId, 0, 0)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		_, _ = w.Write([]byte("Invalid user id"))
+		json.NewEncoder(w).Encode(errorHandler.ServiceError{Message: "Invalid user id"})
 		return
 	}
-	rows, err := repo.Delete(ID)
+	rows, err := userService.Delete(ID)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		_, _ = w.Write([]byte("Invalid user id"))
+		json.NewEncoder(w).Encode(errorHandler.ServiceError{Message: "Invalid user id"})
 		return
 	}
 	if rows == 0 {
 		w.WriteHeader(http.StatusBadRequest)
-		_, _ = w.Write([]byte("User does not exist"))
+		json.NewEncoder(w).Encode(errorHandler.ServiceError{Message: "User does not exist"})
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	_, _ = w.Write([]byte("Deleted successfully"))
+	json.NewEncoder(w).Encode(errorHandler.ServiceError{Message: "user has been deleted successfully"})
 }
