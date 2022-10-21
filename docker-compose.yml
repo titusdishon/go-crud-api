@@ -47,9 +47,9 @@ services:
     ports:
       - "8089:8080"
     volumes:
-      - ./docs:/usr/share/nginx/html/docs
+      - ./swagger-docs:/usr/share/nginx/html/swagger-docs
     environment:
-      API_URL: docs/openapi.yaml
+      API_URL: swagger-docs/openapi.yaml
 
 networks:
   default:
