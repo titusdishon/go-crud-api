@@ -13,7 +13,7 @@ import (
 var (
 	repo       repositories.UserRepository = repositories.NewMysqlRepository()
 	service    services.UserService        = services.NewUserService(repo)
-	httpRouter router.Router               = router.NewChiRouter()
+	httpRouter router.Router               = router.NewMuxRouter()
 	controller controllers.IUserController = controllers.NewUserController(service)
 )
 

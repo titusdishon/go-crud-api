@@ -1,0 +1,27 @@
+openapi: 3.0.0
+info:
+  title: API documentation
+  version: 1.0.0
+servers:
+  - url: http://localhost:8081/
+tags:
+  - name: User
+paths:
+  /users:
+    $ref: './resources/user.yaml#/UserPath'
+  /user/get-by-id/{id}:
+    $ref: './resources/user.yaml#/UserPathWithID'
+  /user/create:
+      $ref: './resources/user.yaml#/UserPath'
+  /user/update/{id}:
+    $ref: './resources/user.yaml#/UserPathWithID'
+  /user/delete/{id}:
+    $ref: './resources/user.yaml#/UserPathWithID'
+
+components:
+  schemas:
+    User:
+      $ref: './schemas/user_schema.yaml'
+#  securitySchemes:
+#    BearerAuth:
+#      $ref: './schemas/security_schema.yaml'

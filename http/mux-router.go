@@ -34,7 +34,7 @@ func (*muxRouter) DELETE(uri string, f func(w http.ResponseWriter, r *http.Reque
 func (*muxRouter) SERVE(port string) {
 	fmt.Printf("Mux running on port: %s", port)
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:4200"},
+		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
 	})
 	http.Handle("/", muxDispatcher)
