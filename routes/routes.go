@@ -5,12 +5,16 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/titusdishon/go-docker-mysql/controllers"
 	router "github.com/titusdishon/go-docker-mysql/http"
+	"github.com/titusdishon/go-docker-mysql/repositories"
+	"github.com/titusdishon/go-docker-mysql/services"
 	"os"
 )
 
 var (
-	httpRouter router.Router               = router.NewMuxRouter()
-	controller controllers.IUserController = controllers.NewUserController()
+	repo       repositories.UserRepository = repositories.NewMysqlRepository()
+	service    services.UserService        = services.NewUserService(repo)
+	httpRouter router.Router               = router.NewChiRouter()
+	controller controllers.IUserController = controllers.NewUserController(service)
 )
 
 var UserRouters = func() {
@@ -20,7 +24,6 @@ var UserRouters = func() {
 	if err != nil {
 		fmt.Println("failed to load env files")
 	}
-	fmt.Printf("Mux running on port: %s", PORT)
 	httpRouter.GET("/", controller.PingMe)
 	httpRouter.GET("/users", controller.GetUsers)
 	httpRouter.POST("/user/create", controller.CreateUser)

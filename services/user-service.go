@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	repo repositories.UserRepository = repositories.NewMysqlRepository()
+	repo repositories.UserRepository
 )
 
 type UserService interface {
@@ -21,7 +21,8 @@ type UserService interface {
 }
 type service struct{}
 
-func NewUserService() UserService {
+func NewUserService(repository repositories.UserRepository) UserService {
+	repo = repository
 	return &service{}
 }
 

@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	userService services.UserService = services.NewUserService()
+	userService services.UserService
 )
 
 type IUserController interface {
@@ -27,7 +27,8 @@ type IUserController interface {
 
 type controller struct{}
 
-func NewUserController() IUserController {
+func NewUserController(service services.UserService) IUserController {
+	userService = service
 	return &controller{}
 }
 
