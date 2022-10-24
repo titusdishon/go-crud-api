@@ -2,12 +2,13 @@ package routes
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/joho/godotenv"
 	"github.com/titusdishon/go-docker-mysql/controllers"
 	router "github.com/titusdishon/go-docker-mysql/http"
 	"github.com/titusdishon/go-docker-mysql/repositories"
 	"github.com/titusdishon/go-docker-mysql/services"
-	"os"
 )
 
 var (
@@ -19,7 +20,7 @@ var (
 
 var UserRouters = func() {
 	err := godotenv.Load()
-	PORT := fmt.Sprintf(":%s", os.Getenv("PORT"))
+	PORT := fmt.Sprintf(":%s", os.Getenv("APP_PORT"))
 
 	if err != nil {
 		fmt.Println("failed to load env files")
@@ -30,5 +31,6 @@ var UserRouters = func() {
 	httpRouter.GET("/user/get-by-id/{userId:[0-9]+}", controller.GetUserById)
 	httpRouter.PUT("/user/update/{userId:[0-9]+}", controller.UpdateUser)
 	httpRouter.DELETE("/user/delete/{userId:[0-9]+}", controller.DeleteAUser)
+
 	httpRouter.SERVE(PORT)
 }

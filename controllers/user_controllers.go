@@ -101,6 +101,7 @@ func (*controller) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 	var user entity.User
 	json.NewDecoder(r.Body).Decode(&user)
+	fmt.Printf("USER DETAILS: %v", user)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(errorHandler.ServiceError{Message: "Wrong data format"})
@@ -128,6 +129,7 @@ func (*controller) UpdateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (*controller) DeleteAUser(w http.ResponseWriter, r *http.Request) {
+	fmt.Print("USER DETAILS:---->Update functionality")
 	w.Header().Set("Content-Type", "application/json")
 	vars := mux.Vars(r)
 	userId := vars["userId"]

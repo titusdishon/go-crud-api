@@ -1,0 +1,44 @@
+
+200: 
+  description: 200response,
+  content:
+    application/json: {}
+
+400: 
+  description: BadRequest,
+  content:
+    application/json: {}
+
+401: 
+  description: Unauthorized,
+  content:
+    application/json: {}
+
+403: 
+  description: Forbidden,
+  content:
+    application/json: {}
+    
+  
+
+404: 
+  description: NotFound,
+  content:
+    application/json: {}
+
+429: 
+  description: TooManyRequests,
+  content:
+    application/json: {}
+
+500: 
+  description: InternalServerError,
+  content:
+    application/json: {}
+
+504: 
+  description: 504GatewayTimeout,
+  content:
+    application/json: {}
+    
+  

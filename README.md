@@ -2,10 +2,12 @@
 
 In this repo I have added the necessary configurations for containerizing a golang application.
 I have also followed the clean architecture pattern where there is no dependency on:
+
 - No database dependency
 - Http library
 Thus separating the business logic from data storage logic.
 This way you can easily switch from one database to the other without needing much configuration
+
 ## Tech stack
 
 - Mysql
@@ -20,11 +22,14 @@ This way you can easily switch from one database to the other without needing mu
 
 ```.env
 
-MYSQL_RANDOM_ROOT_PASSWORD: "some_secret"
-MYSQL_DATABASE: "database_name"
-MYSQL_USER: "some_user"
-MYSQL_PASSWORD: "some_secret"
-PORT:8080
+MYSQL_RANDOM_ROOT_PASSWORD: "secret"
+MYSQL_DATABASE: "test_database"
+MYSQL_USER: "test_user"
+MYSQL_PASSWORD: "secret"
+MYSQL_PORT: 3306
+SWAGGER_PORT: 8080
+MYSQL_HOST:db
+APP_PORT:8081
 
 ```
 
@@ -41,4 +46,4 @@ docker compose build --no-cache
 docker compose up
  ```
 
-- The project should now be available in your local setup using the url [http:localhost:8080](http:localhost:8080)
+- The project should now be available in your local setup using the url [http:localhost:8081](http:localhost:8081)

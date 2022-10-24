@@ -2,6 +2,9 @@ package router
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"log"
 	"net/http"
 
@@ -34,9 +37,11 @@ func (*muxRouter) DELETE(uri string, f func(w http.ResponseWriter, r *http.Reque
 func (*muxRouter) SERVE(port string) {
 	fmt.Printf("Mux running on port: %s", port)
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"*"},
+		AllowedOrigins:   []string{"http://localhost:8080"},
 		AllowCredentials: true,
 	})
+	r := gin.New()
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	http.Handle("/", muxDispatcher)
 	handler := c.Handler(muxDispatcher)
 	log.Fatal(http.ListenAndServe(port, handler))

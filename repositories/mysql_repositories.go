@@ -3,8 +3,6 @@ package repositories
 import (
 	"database/sql"
 	"fmt"
-	"log"
-
 	"github.com/titusdishon/go-docker-mysql/config"
 	"github.com/titusdishon/go-docker-mysql/entity"
 )
@@ -50,12 +48,12 @@ func (*repo) Save(user *entity.User) (*entity.User, error) {
 func (*repo) Update(user *entity.User, id int64) (*entity.User, error) {
 	stmt, err := db.Prepare(`UPDATE users SET name = ?, email = ?, summary = ? WHERE id = ?;`)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	defer stmt.Close()
 	_, err = stmt.Exec(user.Name, user.Email, user.Summary, id)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	return user, nil
 }
