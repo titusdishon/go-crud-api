@@ -6,30 +6,30 @@ UsersGetPath:
     security:
       - BearerAuth: []
     responses:
-      200:
-        description: User was created.
-        content:
-          application/json: { }
+      "200":
+        $ref: "../responses/success.yaml"
 
 UserCreatePath:
   post:
     tags:
       - User
     summary: Create New User
+    security:
+      - BearerAuth: []
     requestBody:
       content:
         application/json:
           schema:
-            $ref: '../schemas/user_schema.yaml'
+            $ref: "../schemas/user_schema.yaml"
             example:
               name: User1
               email: user1@gmail.com
-              summary: 'some description'
+              summary: "some description"
     responses:
-      200:
-        description: User was created.
-        content:
-          application/json: { }
+      "200":
+        $ref: "../responses/success.yaml"
+      "400":
+        $ref: "../responses/bad_request.yaml"
 
 UserUpdatePathWithID:
   put:
@@ -37,16 +37,16 @@ UserUpdatePathWithID:
       - User
     summary: Update user details
     security:
-      - BearerAuth: [ ]
+      - BearerAuth: []
     requestBody:
       content:
         application/json:
           schema:
-            $ref: '../schemas/user_schema.yaml'
+            $ref: "../schemas/user_schema.yaml"
             example:
               name: User1
               email: user1@gmail.com
-              summary: 'some description'
+              summary: "some description"
 
     parameters:
       - in: path
@@ -56,10 +56,10 @@ UserUpdatePathWithID:
           type: string
           example: "1"
     responses:
-      200:
-        description: User was updated.
-        content:
-          application/json: { }
+      "201":
+        $ref: "../responses/success.yaml"
+      "400":
+        $ref: "../responses/bad_request.yaml"
 
 UserGetPathWithID:
   get:
@@ -76,11 +76,9 @@ UserGetPathWithID:
           type: string
           example: "1"
     responses:
-      200:
-        description: User fetched.
-        content:
-          application/json: { }
-        
+      "200":
+        $ref: "../responses/success.yaml"
+
 UserDeletePathWithID:
   delete:
     tags:
@@ -96,7 +94,7 @@ UserDeletePathWithID:
           type: string
           example: "1"
     responses:
-      200:
-        description: User was deleted.
-        content:
-          application/json: { }
+      "201":
+        $ref: "../responses/success.yaml"
+      "400":
+        $ref: "../responses/bad_request.yaml"

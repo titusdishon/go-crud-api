@@ -36,7 +36,7 @@ func (*muxRouter) SERVE(port string) {
 		AllowCredentials: false,
 		AllowedMethods:   []string{"PUT", "GET", "DELETE", "POST"},
 	})
-	//http.Handle("/", muxDispatcher)
+	http.Handle("/", muxDispatcher)
 	handler := c.Handler(muxDispatcher)
 	log.Fatal(http.ListenAndServe(port, handler))
 }
