@@ -18,7 +18,14 @@ func Connect() {
 	if err != nil {
 		fmt.Println("failed to load env files")
 	}
-	DBURL := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), os.Getenv("MYSQL_HOST"), os.Getenv("MYSQL_PORT"), os.Getenv("MYSQL_DATABASE"))
+	var (
+		mysqlUser     = os.Getenv("MYSQL_USER")
+		mysqlPassword = os.Getenv("MYSQL_PASSWORD")
+		mysqlHost     = os.Getenv("MYSQL_HOST")
+		mysqlPort     = os.Getenv("MYSQL_PORT")
+		mysqlDatabase = os.Getenv("MYSQL_DATABASE")
+	)
+	DBURL := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", mysqlUser, mysqlPassword, mysqlHost, mysqlPort, mysqlDatabase)
 	d, err := sql.Open("mysql", DBURL)
 	if err != nil {
 		fmt.Println(err)

@@ -34,7 +34,6 @@ func NewUserController(service services.UserService) IUserController {
 
 func (*controller) PingMe(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Printf("Hit the home endpoint %s", r.URL.Path)
 	_, _ = fmt.Fprintf(w, "Welcome to the home  %s", r.URL.Query().Get("userId"))
 }
 
@@ -101,7 +100,6 @@ func (*controller) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 	var user entity.User
 	json.NewDecoder(r.Body).Decode(&user)
-	fmt.Printf("USER DETAILS: %v", user)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(errorHandler.ServiceError{Message: "Wrong data format"})
@@ -129,7 +127,6 @@ func (*controller) UpdateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (*controller) DeleteAUser(w http.ResponseWriter, r *http.Request) {
-	fmt.Print("USER DETAILS:---->Update functionality")
 	w.Header().Set("Content-Type", "application/json")
 	vars := mux.Vars(r)
 	userId := vars["userId"]

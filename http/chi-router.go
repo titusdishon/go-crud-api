@@ -1,10 +1,10 @@
 package router
 
 import (
-	"fmt"
-	"github.com/go-chi/chi"
 	"log"
 	"net/http"
+
+	"github.com/go-chi/chi"
 )
 
 type chiRouter struct{}
@@ -34,6 +34,5 @@ func (c chiRouter) DELETE(uri string, f func(w http.ResponseWriter, r *http.Requ
 }
 
 func (c chiRouter) SERVE(port string) {
-	fmt.Printf("Chi running on port: %s", port)
 	log.Fatal(http.ListenAndServe(port, chiDispatcher))
 }

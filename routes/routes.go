@@ -20,11 +20,10 @@ var (
 
 var UserRouters = func() {
 	err := godotenv.Load()
-	PORT := fmt.Sprintf(":%s", os.Getenv("APP_PORT"))
-
 	if err != nil {
 		fmt.Println("failed to load env files")
 	}
+	PORT := fmt.Sprintf(":%s", os.Getenv("APP_PORT"))
 	httpRouter.GET("/", controller.PingMe)
 	httpRouter.GET("/users", controller.GetUsers)
 	httpRouter.POST("/user/create", controller.CreateUser)
