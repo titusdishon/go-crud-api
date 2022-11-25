@@ -99,24 +99,22 @@ func (*controller) SignIn(rw http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(rw).Encode(errorHandler.ServiceError{Message: "Wrong data format"})
 	}
 	// validate the request first.
-	if user.Email != "" {
+	if user.Email == "" {
 		rw.WriteHeader(http.StatusBadRequest)
 		rw.Write([]byte("Email Missing"))
 		return
 	}
-	if user.Password != "" {
-		rw.WriteHeader(http.StatusBadRequest)
-		rw.Write([]byte("Password Missing"))
-		return
-	}
+
 	// let’s see if the user exists
 	result, _ := userService.UserExists(&user)
+
 	if result == nil {
 		// this means either the user does not exist
 		rw.WriteHeader(http.StatusUnauthorized)
 		rw.Write([]byte("User Does not Exist"))
 		return
 	}
+
 	valid := utils.CheckPasswordHash(user.Password, result.Password)
 	if !valid {
 		// this means the password is wrong

@@ -13,7 +13,7 @@ type User struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Summary  string `json:"summary"`
-	Password string `json:"-"`
+	Password string `json:"password"`
 }
 
 // check if hashed password is valid

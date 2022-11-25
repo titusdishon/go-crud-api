@@ -85,14 +85,18 @@ func (*repo) FindAll() ([]entity.User, error) {
 
 func (*repo) CheckIfUserExists(user *entity.User) (*entity.User, error) {
 	var userData entity.User
-	err := db.QueryRow(`SELECT id, email, name, summary FROM users WHERE EMAIL LIKE=?;`, user.Email).Scan(&userData.ID,
+
+	err := db.QueryRow(`SELECT id, email, name, summary, password FROM users WHERE email=?;`, user.Email).Scan(
+		&userData.ID,
 		&userData.Email,
 		&userData.Name,
 		&userData.Summary,
 		&userData.Password)
+
 	if err != nil {
 		return nil, err
 	}
+
 	return &userData, nil
 }
 
