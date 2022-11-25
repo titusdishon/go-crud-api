@@ -10,6 +10,7 @@ import (
 	"github.com/titusdishon/go-docker-mysql/entity"
 	errorHandler "github.com/titusdishon/go-docker-mysql/errors"
 	"github.com/titusdishon/go-docker-mysql/services"
+	"github.com/titusdishon/go-docker-mysql/utils"
 )
 
 var (
@@ -21,6 +22,7 @@ type IUserController interface {
 	GetUsers(w http.ResponseWriter, r *http.Request)
 	GetUserById(w http.ResponseWriter, r *http.Request)
 	CreateUser(w http.ResponseWriter, r *http.Request)
+	SignIn(rw http.ResponseWriter, r *http.Request)
 	DeleteAUser(w http.ResponseWriter, r *http.Request)
 	UpdateUser(w http.ResponseWriter, r *http.Request)
 }
@@ -28,6 +30,7 @@ type IUserController interface {
 type controller struct{}
 
 func NewUserController(service services.UserService) IUserController {
+	// dependency injection
 	userService = service
 	return &controller{}
 }
@@ -86,6 +89,51 @@ func (*controller) CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusCreated)
 	_ = json.NewEncoder(w).Encode(result)
+}
+func (*controller) SignIn(rw http.ResponseWriter, r *http.Request) {
+	rw.Header().Set("Content-Type", "application/json")
+	var user entity.User
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		rw.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(rw).Encode(errorHandler.ServiceError{Message: "Wrong data format"})
+	}
+	// validate the request first.
+	if user.Email != "" {
+		rw.WriteHeader(http.StatusBadRequest)
+		rw.Write([]byte("Email Missing"))
+		return
+	}
+	if user.Password != "" {
+		rw.WriteHeader(http.StatusBadRequest)
+		rw.Write([]byte("Password Missing"))
+		return
+	}
+	// let’s see if the user exists
+	result, _ := userService.UserExists(&user)
+	if result == nil {
+		// this means either the user does not exist
+		rw.WriteHeader(http.StatusUnauthorized)
+		rw.Write([]byte("User Does not Exist"))
+		return
+	}
+	valid := utils.CheckPasswordHash(user.Password, result.Password)
+	if !valid {
+		// this means the password is wrong
+		rw.WriteHeader(http.StatusUnauthorized)
+		rw.Write([]byte("Incorrect Password"))
+		return
+	}
+	tokenString, err := utils.GetSignedToken()
+	if err != nil {
+		fmt.Println(err)
+		rw.WriteHeader(http.StatusInternalServerError)
+		rw.Write([]byte("Internal Server Error"))
+		return
+	}
+
+	rw.WriteHeader(http.StatusOK)
+	rw.Write([]byte(tokenString))
 }
 
 func (*controller) UpdateUser(w http.ResponseWriter, r *http.Request) {

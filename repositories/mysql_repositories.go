@@ -18,6 +18,7 @@ type UserRepository interface {
 	Save(user *entity.User) (*entity.User, error)
 	Update(user *entity.User, id int64) (*entity.User, error)
 	FindAll() ([]entity.User, error)
+	CheckIfUserExists(user *entity.User) (*entity.User, error)
 	FindById(id int64) (*entity.User, error)
 	Delete(id int64) (int64, error)
 }
@@ -29,12 +30,13 @@ func NewMysqlRepository() UserRepository {
 }
 
 func (*repo) Save(user *entity.User) (*entity.User, error) {
-	stmt, err := db.Prepare("INSERT INTO users (name, email, summary) VALUES(?,?,?)")
+	stmt, err := db.Prepare("INSERT INTO users (name, email, summary, password) VALUES(?,?,?, ?)")
 	if err != nil {
 		return nil, err
 	}
 	defer stmt.Close()
-	res, err := stmt.Exec(user.Name, user.Email, user.Summary)
+
+	res, err := stmt.Exec(user.Name, user.Email, user.Summary, user.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -69,10 +71,9 @@ func (*repo) FindAll() ([]entity.User, error) {
 		return nil, err
 	}
 	var users []entity.User
-
 	for result.Next() {
 		var u entity.User
-		err = result.Scan(&u.ID, &u.Name, &u.Email, &u.Summary)
+		err = result.Scan(&u.ID, &u.Name, &u.Email, &u.Summary, &u.Password)
 		if err != nil {
 			return nil, err
 		}
@@ -80,6 +81,19 @@ func (*repo) FindAll() ([]entity.User, error) {
 		users = append(users, u)
 	}
 	return users, nil
+}
+
+func (*repo) CheckIfUserExists(user *entity.User) (*entity.User, error) {
+	var userData entity.User
+	err := db.QueryRow(`SELECT id, email, name, summary FROM users WHERE EMAIL LIKE=?;`, user.Email).Scan(&userData.ID,
+		&userData.Email,
+		&userData.Name,
+		&userData.Summary,
+		&userData.Password)
+	if err != nil {
+		return nil, err
+	}
+	return &userData, nil
 }
 
 func (*repo) FindById(id int64) (*entity.User, error) {

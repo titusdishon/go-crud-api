@@ -27,9 +27,9 @@ var UserRouters = func() {
 	httpRouter.GET("/", controller.PingMe)
 	httpRouter.GET("/users", controller.GetUsers)
 	httpRouter.POST("/user/create", controller.CreateUser)
+	httpRouter.POST("/user/sign-in", controller.SignIn)
 	httpRouter.GET("/user/get-by-id/{userId:[0-9]+}", controller.GetUserById)
 	httpRouter.PUT("/user/update/{userId:[0-9]+}", controller.UpdateUser)
 	httpRouter.DELETE("/user/delete/{userId:[0-9]+}", controller.DeleteAUser)
-
 	httpRouter.SERVE(PORT)
 }
